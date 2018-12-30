@@ -1,0 +1,141 @@
+service: appsync-chat
+
+plugins:
+  - serverless-appsync-plugin
+
+provider:
+  name: aws
+  region: us-east-1
+
+custom:
+  appSync:
+    name: chat-api
+    serviceRole: 'AppSyncServiceRole'
+    authenticationType: AMAZON_COGNITO_USER_POOLS
+    userPoolConfig:
+      awsRegion: ${self:provider.region}
+      defaultAction: ALLOW
+      userPoolId: 
+        Ref: CognitoUserPoolAppSync
+    logConfig:
+      loggingRoleArn: { Fn::GetAtt: [AppSyncLoggingServiceRole, Arn] }
+      level: ALL
+    mappingTemplates:
+      - dataSource: AppSyncUsers
+        type: Query
+        field: userInfo
+        request: 'userInfo-request-mapping-template.vtl'
+        response: 'userInfo-response-mapping-template.vtl'
+      - dataSource: AppSyncUsers
+        type: Mutation
+        field: createUser
+        request: "createUser-request-mapping-template.vtl"
+        response: "createUser-response-mapping-template.vtl"
+    dataSources:
+      - type: AMAZON_DYNAMODB
+        name: AppSyncUsers
+        description: 'AppSync Users table'
+        config:
+          tableName: { Ref: UserTable }
+          serviceRoleArn: { Fn::GetAtt: [AppSyncDynamoDBServiceRole, Arn] }
+
+resources:
+  Resources:
+    UserTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'AppSyncUsers'
+
+    AppSyncDynamoDBServiceRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+        RoleName: "Dynamo-${self:custom.appSync.serviceRole}"
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            -
+              Effect: "Allow"
+              Principal:
+                Service:
+                  - "appsync.amazonaws.com"
+              Action:
+                - "sts:AssumeRole"
+        Policies:
+          -
+            PolicyName: "Dynamo-${self:custom.appSync.serviceRole}-Policy"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                -
+                  Effect: "Allow"
+                  Action:
+                    - "dynamodb:Query"
+                    - "dynamodb:BatchWriteItem"
+                    - "dynamodb:GetItem"
+                    - "dynamodb:DeleteItem"
+                    - "dynamodb:PutItem"
+                    - "dynamodb:Scan"
+                    - "dynamodb:UpdateItem"
+                  Resource:
+                    - Fn::Join: [ '', [ 'arn:aws:dynamodb:', Ref: AWS::Region, ':', Ref: AWS::AccountId, ':table/AppSyncUsers' ] ]
+                    - Fn::Join: [ '', [ 'arn:aws:dynamodb:', Ref: AWS::Region, ':', Ref: AWS::AccountId, ':table/AppSyncUsers/*' ] ]
+
+    AppSyncLoggingServiceRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: Logging-${self:custom.appSync.serviceRole}
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - 
+              Effect: Allow
+              Principal:
+                Service:
+                  - "appsync.amazonaws.com"
+              Action: 
+                - "sts:AssumeRole"
+        Policies:
+          - 
+            PolicyName: Logging-${self:custom.appSync.serviceRole}-Policy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement: 
+                - 
+                  Effect: Allow
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:PutLogEvents
+                    - logs:CreateLogStream
+                  Resource: '*'
+
+    CognitoUserPoolAppSync:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: appsync-pool
+        AutoVerifiedAttributes:
+          - email
+        MfaConfiguration: OFF
+        Schema:
+          - AttributeDataType: String
+            Name: email
+            Required: true
+            Mutable: true
+
+    ReactAppClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        GenerateSecret: false
+        RefreshTokenValidity: 200
+        UserPoolId:
+          Ref: CognitoUserPoolAppSync

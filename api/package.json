@@ -1,0 +1,12 @@
+{
+  "name": "appsync-react-chat",
+  "version": "1.0.0",
+  "description": "AWS AppSync React Chat",
+  "keywords": [],
+  "author": "Lucas Vieira da Silva <lucas.vieira94@outlook.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "aws-sdk": "^2.382.0",
+    "serverless-appsync-plugin": "^1.0.9"
+  }
+}
