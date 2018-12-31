@@ -2,10 +2,25 @@ type Mutation {
     createUser(
         email: String
     ): User!
+
+    createRoom(
+        room: String
+    ): Room!
 }
 
 type Query {
     userInfo: User!
+    rooms: RoomPaginated!
+}
+
+type RoomPaginated {
+    items: [Room]!
+    nextToken: String
+}
+
+type Room {
+    room: String
+    owner: User!
 }
 
 type User {

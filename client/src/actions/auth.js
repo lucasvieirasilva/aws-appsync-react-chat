@@ -4,12 +4,23 @@ import {
     CONFIRM_ERROR,
     CONFIRM_SUCCESS,
     LOGIN_SUCCESS,
-    LOGIN_ERROR
+    LOGIN_ERROR,
+    LOGOUT
 } from '../contants/actionTypes';
 import { Auth } from 'aws-amplify';
 import { setProgress, redirectTo } from './common';
 
-export const login = (email, password, apolloCreateUser) => {
+export const logged = () => {
+    return dispatch => {
+        Auth.currentAuthenticatedUser()
+            .then((user) => dispatch({ type: LOGIN_SUCCESS, user }))
+            .catch(() => {
+                dispatch(redirectTo('/login'));
+            });
+    };
+}
+
+export const login = (email, password, createAction) => {
     return dispatch => {
         dispatch(setProgress(true));
         const params = {
@@ -19,14 +30,14 @@ export const login = (email, password, apolloCreateUser) => {
         
         Auth.signIn(params)
             .then((data) => {
-                apolloCreateUser({
+                createAction({
                     variables: {
                         email: email
                     }
                 }).then(() => {
                     dispatch(setProgress(false));
                     dispatch({ type: LOGIN_SUCCESS, user: data });
-                    dispatch(redirectTo('/home'));
+                    dispatch(redirectTo('/'));
                 }).catch((error) => {
                     dispatch(setProgress(false));
                     dispatch({ type: LOGIN_ERROR, error: error });
@@ -84,4 +95,13 @@ export const register = (email, password) => {
                 dispatch(setProgress(false));
             });
     }
+}
+
+export const logout = () => {
+    return dispatch => {
+        Auth.signOut().then(() => {
+            dispatch({type: LOGOUT })
+            dispatch(redirectTo('/login'));
+        })
+    };
 }

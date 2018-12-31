@@ -31,12 +31,33 @@ custom:
         field: createUser
         request: "createUser-request-mapping-template.vtl"
         response: "createUser-response-mapping-template.vtl"
+      - dataSource: AppSyncChatRoomTable
+        type: Query
+        field: rooms
+        request: 'rooms-request-mapping-template.vtl'
+        response: 'rooms-response-mapping-template.vtl'
+      - dataSource: AppSyncUsers
+        type: Room
+        field: owner
+        request: 'room-owner-request-mapping-template.vtl'
+        response: 'room-owner-response-mapping-template.vtl'
+      - dataSource: AppSyncChatRoomTable
+        type: Mutation
+        field: createRoom
+        request: "createRoom-request-mapping-template.vtl"
+        response: "createRoom-response-mapping-template.vtl"
     dataSources:
       - type: AMAZON_DYNAMODB
         name: AppSyncUsers
         description: 'AppSync Users table'
         config:
           tableName: { Ref: UserTable }
+          serviceRoleArn: { Fn::GetAtt: [AppSyncDynamoDBServiceRole, Arn] }
+      - type: AMAZON_DYNAMODB
+        name: AppSyncChatRoomTable
+        description: 'AppSync Chat Room table'
+        config:
+          tableName: { Ref: ChatRoomTable }
           serviceRoleArn: { Fn::GetAtt: [AppSyncDynamoDBServiceRole, Arn] }
 
 resources:
@@ -56,6 +77,22 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: 'AppSyncUsers'
+
+    ChatRoomTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        KeySchema:
+          -
+            AttributeName: room
+            KeyType: HASH
+        AttributeDefinitions:
+          -
+            AttributeName: room
+            AttributeType: S
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'AppSyncChatRoom'
 
     AppSyncDynamoDBServiceRole:
       Type: "AWS::IAM::Role"
@@ -90,6 +127,8 @@ resources:
                   Resource:
                     - Fn::Join: [ '', [ 'arn:aws:dynamodb:', Ref: AWS::Region, ':', Ref: AWS::AccountId, ':table/AppSyncUsers' ] ]
                     - Fn::Join: [ '', [ 'arn:aws:dynamodb:', Ref: AWS::Region, ':', Ref: AWS::AccountId, ':table/AppSyncUsers/*' ] ]
+                    - Fn::Join: [ '', [ 'arn:aws:dynamodb:', Ref: AWS::Region, ':', Ref: AWS::AccountId, ':table/AppSyncChatRoom' ] ]
+                    - Fn::Join: [ '', [ 'arn:aws:dynamodb:', Ref: AWS::Region, ':', Ref: AWS::AccountId, ':table/AppSyncChatRoom/*' ] ]
 
     AppSyncLoggingServiceRole:
       Type: AWS::IAM::Role

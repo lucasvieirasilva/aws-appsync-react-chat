@@ -10,15 +10,19 @@ import * as serviceWorker from './serviceWorker';
 import './aws/amplify';
 import { client } from './aws/appsync';
 import App from './components/App';
+import { Rehydrated } from 'aws-appsync-react';
 
-ReactDOM.render((<Provider store={store}>
-    <ConnectedRouter store={store} history={history}>
-        <ApolloProvider client={client}>
-            <Switch>
-                <Route path="/" component={App} />
-            </Switch>
-        </ApolloProvider>
-    </ConnectedRouter>
-</Provider>), document.getElementById('root'));
+ReactDOM.render((
+    <ApolloProvider client={client}>
+        <Rehydrated>
+            <Provider store={store}>
+                <ConnectedRouter store={store} history={history}>
+                    <Switch>
+                        <Route path="/" component={App} />
+                    </Switch>
+                </ConnectedRouter>
+            </Provider>
+        </Rehydrated>
+    </ApolloProvider>), document.getElementById('root'));
 
 serviceWorker.unregister();

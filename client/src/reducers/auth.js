@@ -4,7 +4,8 @@ import {
     CONFIRM_SUCCESS,
     CONFIRM_ERROR,
     LOGIN_SUCCESS,
-    LOGIN_ERROR
+    LOGIN_ERROR,
+    LOGOUT
 } from '../contants/actionTypes';
 
 const initialState = {}
@@ -29,6 +30,12 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 error: action.error
+            };
+        case LOGOUT:
+            return {
+                ...state,
+                user: null,
+                error: null
             };
         default:
             return state;

@@ -7,3 +7,4 @@ export const LOGIN_ERROR = '@@app/LOGIN_ERROR';
 export const PROGRESS = '@@app/PROGRESS';
 export const REDIRECT_TO = '@@app/REDIRECT_TO';
 export const REDIRECTED = '@@app/REDIRECTED';
+export const LOGOUT = '@@app/LOGOUT';
