@@ -18,6 +18,12 @@ const LIST_ROOMS = gql`
 `
 
 class RoomList extends Component {
+    componentWillReceiveProps(props) {
+        if (props.needRefetch) {
+            props.data.refetch();
+        }
+    }
+
     render() {
         const { data: { loading, rooms } } = this.props;
         if (loading) return <h4>Loading Rooms...</h4>;
@@ -34,4 +40,8 @@ class RoomList extends Component {
     }
 }
 
-export default graphql(LIST_ROOMS)(connect()(RoomList));
+const mapStateToProps = ({ room }) => ({
+    needRefetch: room.refetch
+})
+
+export default graphql(LIST_ROOMS)(connect(mapStateToProps)(RoomList));
