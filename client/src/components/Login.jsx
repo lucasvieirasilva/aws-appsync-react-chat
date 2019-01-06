@@ -3,18 +3,12 @@ import { connect } from 'react-redux';
 import { Button, Input, Form, FormGroup, Col, Label, Alert } from 'reactstrap';
 import { redirectTo } from '../actions/common';
 import { login } from '../actions/auth';
-import { graphql } from "react-apollo";
-import gql from 'graphql-tag';
-
-const CREATE_USER = gql`
-    mutation createUser($email: String!) {
-        createUser(email: $email) {
-            id
-        }
-    }
-`;
 
 class Login extends Component {
+    constructor(props) {
+        super(props);
+        console.log(this);
+    }
 
     onSubmit(event) {
         event.preventDefault();
@@ -65,8 +59,8 @@ const mapStateToProps = state => ({ ...state.auth, inProgress: state.common.inPr
 const mapDispatchToProps = dispatch => {
     return {
         redirect: (value) => dispatch(redirectTo(value)),
-        login: (email, password, apolloCreateUser) => dispatch(login(email, password, apolloCreateUser))
+        login: (email, password) => dispatch(login(email, password))
     }
 }
 
-export default graphql(CREATE_USER)(connect(mapStateToProps, mapDispatchToProps)(Login))
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

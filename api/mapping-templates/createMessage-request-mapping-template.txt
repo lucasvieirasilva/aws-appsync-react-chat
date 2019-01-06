@@ -1,0 +1,12 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "PutItem",
+    "key" : {
+        "messageId" : { "S" : "$util.autoId()" },
+        "createdAt": {"S" : "$util.time.nowISO8601()" }
+    },
+    "attributeValues" : {
+        "body" : { "S" : "${context.arguments.body}" },
+        "handle" : { "S" : "${context.identity.username}" }
+    }
+}

@@ -1,35 +1,27 @@
 type Mutation {
-    createUser(
-        email: String
-    ): User!
-
-    createRoom(
-        room: String,
-        visibility: String
-    ): Room!
+    createMessage(
+        body: String!
+    ): Message!
 }
 
 type Query {
-    userInfo: User!
-    rooms: RoomPaginated!
+    getMessages(filter: String): [Message!]!
 }
 
-type RoomPaginated {
-    items: [Room]!
-    nextToken: String
+type Subscription {
+    addMessage: Message
+        @aws_subscribe(mutations: ["createMessage"])
 }
 
-type Room {
-    room: String
-    owner: User!
-}
-
-type User {
-    id: String
-    email: String
+type Message {
+    messageId: String!
+    body: String!
+    createdAt: String!
+    handle: String!
 }
 
 schema {
     query: Query
     mutation: Mutation
+    subscription: Subscription
 }

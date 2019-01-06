@@ -1,12 +1,12 @@
 import { combineReducers } from 'redux';
 import auth from './reducers/auth';
 import common from './reducers/common';
-import room from './reducers/room';
+import chat from './reducers/chat';
 import { routerReducer } from 'react-router-redux';
 
 export default combineReducers({
     auth,
     common,
-    room,
+    chat,
     router: routerReducer
 });

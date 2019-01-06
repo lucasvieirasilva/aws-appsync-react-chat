@@ -5,7 +5,6 @@ import Register from './Register';
 import Home from './Home';
 import Confirm from './Confirm';
 import { Route, Switch } from 'react-router-dom';
-import { Container } from 'reactstrap';
 import { redirected } from '../actions/common';
 import { logged } from '../actions/auth';
 import Header from './Header';
@@ -28,14 +27,12 @@ class App extends Component {
     return (
       <div>
         <Header></Header>
-        <Container>
-          <Switch>
-            <Route exact path="/" component={Home} />
-            <Route path="/confirm" component={Confirm} />
-            <Route path="/register" component={Register} />
-            <Route path="/login" component={Login} />
-          </Switch>
-        </Container>
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route path="/confirm" component={Confirm} />
+          <Route path="/register" component={Register} />
+          <Route path="/login" component={Login} />
+        </Switch>
       </div>
     )
   }

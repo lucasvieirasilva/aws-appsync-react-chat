@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Nav, Navbar, NavbarBrand, NavbarToggler, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { Nav, Navbar, NavbarBrand, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { redirectTo } from '../actions/common';
 import { logout } from '../actions/auth';
 
@@ -20,7 +20,6 @@ class Header extends Component {
         return (
             <Navbar color="light" light expand="md">
                 <NavbarBrand onClick={(e) => this.redirectToHome(e)}>AWS AppSync</NavbarBrand>
-                <NavbarToggler />
                 <Nav className="ml-auto" navbar>
                     {currentUser && (
                         <UncontrolledDropdown nav inNavbar>

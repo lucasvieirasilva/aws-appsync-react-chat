@@ -20,7 +20,7 @@ export const logged = () => {
     };
 }
 
-export const login = (email, password, createAction) => {
+export const login = (email, password) => {
     return dispatch => {
         dispatch(setProgress(true));
         const params = {
@@ -30,18 +30,9 @@ export const login = (email, password, createAction) => {
         
         Auth.signIn(params)
             .then((data) => {
-                createAction({
-                    variables: {
-                        email: email
-                    }
-                }).then(() => {
-                    dispatch(setProgress(false));
-                    dispatch({ type: LOGIN_SUCCESS, user: data });
-                    dispatch(redirectTo('/'));
-                }).catch((error) => {
-                    dispatch(setProgress(false));
-                    dispatch({ type: LOGIN_ERROR, error: error });
-                });                
+                dispatch(setProgress(false));
+                dispatch({ type: LOGIN_SUCCESS, user: data });
+                dispatch(redirectTo('/'));               
             })
             .catch((error) => { 
                 if (error.code === "UserNotConfirmedException") {
