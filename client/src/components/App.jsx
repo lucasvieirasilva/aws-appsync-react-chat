@@ -6,16 +6,9 @@ import Home from './Home';
 import Confirm from './Confirm';
 import { Route, Switch } from 'react-router-dom';
 import { redirected } from '../actions/common';
-import { logged } from '../actions/auth';
 import Header from './Header';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-
-    this.props.logged();
-  }
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.redirectTo) {
       nextProps.history.push(nextProps.redirectTo);
@@ -48,8 +41,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    redirected: () => dispatch(redirected()),
-    logged: () => dispatch(logged())
+    redirected: () => dispatch(redirected())
   }
 }
 
